@@ -10,6 +10,9 @@ using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.IO;
 using ClosedXML.Excel;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
+
 
 namespace ss_escolar
 {
@@ -277,7 +280,7 @@ namespace ss_escolar
             //--------------------------------------------
             hoja.Cell(1, 7).Value = "Telefono";
             hoja.Cell(1, 7).Style.Font.Bold = true;
-            //--------------------------------------------
+            //-------------------------------------------
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
                 for (int k = 0; k < dataGridView1.Columns.Count; k++)
@@ -292,7 +295,64 @@ namespace ss_escolar
 
         private void buttonPDF_Click(object sender, EventArgs e)
         {
+            try
+            {
+
+                saveFileDialog1.Title = "Guardar";
+                saveFileDialog1.FileName = "nombre de archivo*.pdf";
+                saveFileDialog1.InitialDirectory = @"E:/"; //direccion
+                saveFileDialog1.Filter = "archivo pdf|*.pdf";
+
+                saveFileDialog1.ShowDialog();
+
+                string archivo;
+                archivo = saveFileDialog1.FileName;
+                MessageBox.Show(archivo);
+
+                Document pruebaPdf = new Document(iTextSharp.text.PageSize.LETTER.Rotate());
+
+                PdfWriter.GetInstance(pruebaPdf, new FileStream(saveFileDialog1.FileName, FileMode.Create));
+                pruebaPdf.Open();
+
+                PdfPTable tablaPdf = new PdfPTable(7);
+                PdfPCell titulo = new PdfPCell(new Phrase("Sistema escolar"));
+                titulo.Colspan = 7;
+                tablaPdf.AddCell(titulo);
+                tablaPdf.AddCell("Matrucula");
+                tablaPdf.AddCell("Apellido P");
+                tablaPdf.AddCell("Apellido M");
+                tablaPdf.AddCell("Nombre");
+                tablaPdf.AddCell("Nacimiento");
+                tablaPdf.AddCell("Correo");            
+                tablaPdf.AddCell("Telefono");
+
+                for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                {
+                    tablaPdf.AddCell(dataGridView1[0,i].Value.ToString());
+                    tablaPdf.AddCell(dataGridView1[1, i].Value.ToString());
+                    tablaPdf.AddCell(dataGridView1[2, i].Value.ToString());
+                    tablaPdf.AddCell(dataGridView1[3, i].Value.ToString());
+                    tablaPdf.AddCell(dataGridView1[4, i].Value.ToString());
+                    tablaPdf.AddCell(dataGridView1[5, i].Value.ToString());
+                    tablaPdf.AddCell(dataGridView1[6, i].Value.ToString());
+
+                }
+
+
+
+
+                pruebaPdf.Add(tablaPdf);
+                pruebaPdf.Close();
+
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show(error +"");
+            }
+
+
 
         }
     }
 }
+//WHY
